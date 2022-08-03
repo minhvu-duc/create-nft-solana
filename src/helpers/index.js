@@ -17,27 +17,34 @@ import { Buffer } from 'buffer'
 import { mnemonicToSeedSync } from 'bip39'
 import { derivePath } from 'ed25519-hd-key'
 
-export const getMetadataContent = () => {
+export const getMetadataContent = (
+  name,
+  symbol,
+  description,
+  sellerFeeBasisPoints,
+  file,
+  walletAddress
+) => {
   return {
-    name: 'example_name_102',
-    symbol: 'EXS',
-    description: 'this is an example description',
-    sellerFeeBasisPoints: 2000, // 1000 === 10%
-    image: 'example_2.jpg',
+    name: name,
+    symbol: symbol,
+    description: description,
+    sellerFeeBasisPoints: sellerFeeBasisPoints, // 1000 === 10%
+    image: file.name,
     animation_url: undefined,
     external_url: '',
     properties: {
       category: 'image',
       files: [
         {
-          type: 'image/jpeg',
-          uri: 'example_2.jpg'
+          type: file.type,
+          uri: file.name
         }
       ]
     },
     creators: [
       new Creator({
-        address: '8JSfQqjH8ZGzcB2NhVDBMGAJEsptGYjcoYKLDcQDXXAc',
+        address: walletAddress,
         share: 100,
         verified: true
       })
