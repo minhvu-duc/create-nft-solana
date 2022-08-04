@@ -26,8 +26,18 @@ import {
 } from '../../helpers'
 
 const CreateNFT = ({ AccountState, dispatchAccount }) => {
+  const [isCompleteStep1, setIsCompleteStep1] = useState(false)
+  const [isCompleteStep2, setIsCompleteStep2] = useState(false)
+  const [isCompleteStep3, setIsCompleteStep3] = useState(false)
+  const [isCompleteStep4, setIsCompleteStep4] = useState(false)
+  const [isCompleteStep5, setIsCompleteStep5] = useState(false)
+  const [isCompleteStep6, setIsCompleteStep6] = useState(false)
+  const [isCompleteStep7, setIsCompleteStep7] = useState(false)
+  const [isCompleteStep8, setIsCompleteStep8] = useState(false)
+  const [isCompleteStep9, setIsCompleteStep9] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
   const [name, setName] = useState('')
   const [symbol, setSymbol] = useState('')
   const [description, setDescription] = useState('')
@@ -41,10 +51,12 @@ const CreateNFT = ({ AccountState, dispatchAccount }) => {
     const connection = new Connection(clusterApiUrl('devnet'))
 
     const metadata = metadataInput
+    setIsCompleteStep1(true)
     console.log('STEP 1: get metadataContent')
     const metadataContent = metadataInput
     console.log('----- ', metadataContent)
 
+    setIsCompleteStep2(true)
     console.log('STEP 2: get files array')
     const realFiles = [
       file,
@@ -52,11 +64,13 @@ const CreateNFT = ({ AccountState, dispatchAccount }) => {
     ]
     console.log('----- ', realFiles)
 
+    setIsCompleteStep3(true)
     console.log('STEP 3: prepay for files')
     const { instructions: pushInstructions, signers: pushSigners } =
       await prepPayForFilesTxn(wallet, realFiles)
     console.log('----- ', pushInstructions)
 
+    setIsCompleteStep4(true)
     console.log('STEP 4: Create Mint account')
     const tokenProgramId = new PublicKey(
       'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
@@ -78,11 +92,10 @@ const CreateNFT = ({ AccountState, dispatchAccount }) => {
       toPublicKey(payerPublicKey),
       signers
     ).toBase58()
-    setTxLink(
-      `https://solscan.io/token/${mintKey}?cluster=devnet`
-    )
+    setTxLink(`https://solscan.io/token/${mintKey}?cluster=devnet`)
     console.log('----- ', mintKey) // NFT ID
-
+    
+    setIsCompleteStep5(true)
     console.log('STEP 5: Create Token account')
     const associatedTokenProgramId = new PublicKey(
       'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
@@ -106,6 +119,7 @@ const CreateNFT = ({ AccountState, dispatchAccount }) => {
     )
     console.log('----- instruction', instructions)
 
+    setIsCompleteStep6(true)
     console.log('STEP 6: Create metadata account')
     console.log('----- metadata', metadata)
     const metadataAccount = await createMetadataV2(
@@ -131,6 +145,7 @@ const CreateNFT = ({ AccountState, dispatchAccount }) => {
     )
     console.log('----- metaAccount', metadataAccount)
 
+    setIsCompleteStep7(true)
     console.log('STEP 7: Send transaction')
     const { txid } = await sendTransactionWithRetry(
       connection,
@@ -141,6 +156,7 @@ const CreateNFT = ({ AccountState, dispatchAccount }) => {
     )
     console.log('----- Transaction id: ', txid)
 
+    setIsCompleteStep8(true)
     await connection.confirmTransaction(txid, 'max')
 
     console.log('STEP 8: Upload to Arweave')
@@ -162,6 +178,7 @@ const CreateNFT = ({ AccountState, dispatchAccount }) => {
     const result = await uploadToArweave(data)
     console.log('----- result', result)
 
+    setIsCompleteStep9(true)
     console.log('STEP 9: Update metadata account')
     const metadataFile = result.messages?.find(
       (m) => m.filename === 'manifest.json'
@@ -324,13 +341,42 @@ const CreateNFT = ({ AccountState, dispatchAccount }) => {
           {isLoading && (
             <div className="loading-text"> We are creating your NFT...</div>
           )}
+          {isCompleteStep1 && (
+            <div className="loading-step"> STEP 1: get metadataContent </div>
+          )}
+          {isCompleteStep2 && (
+            <div className="loading-step"> STEP 2: get files array </div>
+          )}
+          {isCompleteStep3 && (
+            <div className="loading-step"> STEP 3: prepay for files </div>
+          )}
+          {isCompleteStep4 && (
+            <div className="loading-step"> STEP 4: Create Mint account </div>
+          )}
+          {isCompleteStep5 && (
+            <div className="loading-step"> STEP 5: Create Token account </div>
+          )}
+          {isCompleteStep6 && (
+            <div className="loading-step">STEP 6: Create metadata account</div>
+          )}
+          {isCompleteStep7 && (
+            <div className="loading-step">STEP 7: Send transaction</div>
+          )}
+          {isCompleteStep8 && (
+            <div className="loading-step">STEP 8: Upload to Arweave</div>
+          )}
+          {isCompleteStep9 && (
+            <div className="loading-step">STEP 9: Update metadata account</div>
+          )}
 
           {isSuccess && (
             <div>
               <div className="result-text">You successfully created an NFT</div>
               <div className="result-text">
                 You can find you transaction at the link:{' '}
-                <a href={txLink} target='__blank'>Your transaction</a>
+                <a href={txLink} target="__blank">
+                  Your transaction
+                </a>
               </div>
             </div>
           )}

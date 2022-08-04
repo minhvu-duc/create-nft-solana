@@ -24,7 +24,7 @@ function App() {
   return (
     <div className="App">
       {!isEmpty(state.wallet) ? (
-        <div className="wallet-state on">Wallet connected</div>
+        <div className="wallet-state on">Wallet connected (devnet)</div>
       ) : (
         <div className="wallet-state off">Wallet disconnected</div>
       )}
